@@ -45,13 +45,14 @@ jobs:
       - name: making .env
         run: echo "${{ secrets.DOT_ENV }}" > .env
 
-      - name: 🚀 Menyinkronkan File ke Server (AEnterprise)
+      - name: Menyinkronkan File ke Server (AEnterprise)
         uses: AEnterprise/rsync-deploy@v1.0.2
         env:
           DEPLOY_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
           ARGS: "-avzr --delete"
           SERVER_IP: ${{ secrets.SSH_HOST }}
           USERNAME: ${{ secrets.SSH_USERNAME }}
+          SERVER_PORT: "22"
           FOLDER: "./"
           SERVER_DESTINATION: "/var/www/mona"
           EXCLUDE: ".git/,.github/,node_modules/"
