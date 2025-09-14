@@ -1,0 +1,68 @@
+name: Deploy to Azure VM
+
+on:
+  push:
+    branches:
+      - master
+
+  pull_request:
+    types: [closed]
+    branches:
+      - master
+
+jobs:
+  deploy:
+    if: github.event.pull_request.merged == true || github.event_name == 'push'
+    
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: PHP Setup
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          extensions: mbstring, xml, curl, zip, mysql, bcmath, gd
+          tools: composer
+
+      - name: Node.js setup
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install Composer
+        run: composer install --prefer-dist --no-progress --no-dev --optimize-autoloader
+
+      - name: Install NPM
+        run: npm install
+
+      - name: Building React Asset
+        run: npm run build
+
+      - name: making .env
+        run: echo "${{ secrets.DOT_ENV }}" > .env
+
+      - name: Server side file sync
+        uses: appleboy/rsync-deploy@v1
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USERNAME }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          source: "./"
+          target: "/var/www/mona"
+          exclude: |
+            .git/
+            .github/
+            node_modules/
+
+      - name: Run deployment script
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USERNAME }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            bash ~/deploy.sh
