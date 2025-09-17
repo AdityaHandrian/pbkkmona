@@ -21,6 +21,18 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v4
 
+      - name: Menyinkronkan File ke Server (AEnterprise)
+        uses: AEnterprise/rsync-deploy@v1.0.2
+        env:
+          DEPLOY_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+          ARGS: "-avzr --delete"
+          SERVER_IP: ${{ secrets.SSH_HOST }}
+          USERNAME: ${{ secrets.SSH_USERNAME }}
+          SERVER_PORT: "22"
+          FOLDER: "./"
+          SERVER_DESTINATION: "/var/www/mona"
+          EXCLUDE: ".git/,.github/,node_modules/"
+
       - name: PHP Setup
         uses: shivammathur/setup-php@v2
         with:
@@ -45,18 +57,6 @@ jobs:
 
       - name: making .env
         run: echo "${{ secrets.DOT_ENV }}" > .env
-
-      - name: Menyinkronkan File ke Server (AEnterprise)
-        uses: AEnterprise/rsync-deploy@v1.0.2
-        env:
-          DEPLOY_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
-          ARGS: "-avzr --delete"
-          SERVER_IP: ${{ secrets.SSH_HOST }}
-          USERNAME: ${{ secrets.SSH_USERNAME }}
-          SERVER_PORT: "22"
-          FOLDER: "./"
-          SERVER_DESTINATION: "/var/www/mona"
-          EXCLUDE: ".git/,.github/,node_modules/"
           
       - name: Run deployment script
         uses: appleboy/ssh-action@v1
