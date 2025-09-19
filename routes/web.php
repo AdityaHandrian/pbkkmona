@@ -1,8 +1,10 @@
 <?php
 
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\OcrController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Http\Request;
 use Inertia\Inertia;
 
 Route::get('/', function () {
@@ -21,6 +23,12 @@ Route::get('/dashboard', function () {
 Route::get('/', function () {
     return view('testing');
 })->name('testing');
+
+Route::get('/scan-receipt', function () {
+    return view('scan-receipt');
+})->name('scan-receipt');
+
+Route::post('/process-receipt', [OcrController::class, 'getAIResponse']);
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
