@@ -7,7 +7,7 @@ export default function Landing({ auth }) {
             <div className="min-h-screen bg-[#F8F7F0] font-sans">
                 {/* Header */}
                 <header className="border-b border-[#E0E0E0] bg-white">
-                    <div className="max-w-[1200px] mx-auto px-6 py-6 flex items-center justify-between">
+                    <div className="max-w-[1500px] mx-auto px-6 py-6 flex items-center justify-between">
                         {/* Logo */}
                         <div className="flex items-center space-x-3">
                             <img src="/images/logo.png" alt="MONA Logo" className="max-h-20"/>
@@ -26,9 +26,9 @@ export default function Landing({ auth }) {
 
                 {/* Hero Section */}
                 <section className="text-center py-20">
-                    <div className="max-w-[1200px] mx-auto px-6">
+                    <div className="max-w-[1500px] mx-auto px-6">
                         <div className="max-w-6xl mx-auto">
-                        <h1 className="text-3xl lg:text-5xl font-bold text-[#2C2C2C] leading-tight mb-6">
+                        <h1 className="text-4xl lg:text-6xl font-bold text-[#2C2C2C] leading-tight mb-6">
                             Take Full Control of Your{' '}
                             <span className="text-[#058743]">Financial Future</span>
                         </h1>
@@ -49,7 +49,7 @@ export default function Landing({ auth }) {
 
                 {/* Features Section */}
                 <section className="py-20">
-                    <div className="max-w-[1200px] mx-auto px-6">
+                    <div className="max-w-[1500px] mx-auto px-6">
                         <div className="text-center mb-16">
                             <h2 className="text-3xl lg:text-5xl font-bold text-[#2C2C2C] mb-4">
                                 Everything You Need in One Place
@@ -99,7 +99,7 @@ export default function Landing({ auth }) {
 
                 {/* Footer */}
                 <footer className="border-t border-[#E0E0E0] bg-white">
-                    <div className="max-w-[1200px] mx-auto px-6 py-4 text-center">
+                    <div className="max-w-[1500px] mx-auto px-6 py-4 text-center">
                         <p className="text-[#2C2C2C] text-sm">
                         © 2025 MONA. All Rights Reserved. Built with{' '}
                             <span className="text-red-500">❤</span> for better financial habits.
