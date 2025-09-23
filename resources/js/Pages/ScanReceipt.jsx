@@ -22,50 +22,78 @@ export default function ScanReceipt({ auth }) {
     ];
 
     // Helper function to map OCR category to our predefined categories (multilingual)
-    const mapToValidCategory = (ocrCategory) => {
-        if (!ocrCategory) return 'Other'; // Default to Other if no category detected
+    const mapToValidCategory = (ocrCategory, description = '') => {
+        if (!ocrCategory && !description) return 'Other';
         
-        const categoryLower = ocrCategory.toLowerCase();
+        // Combine category and description for better matching
+        const searchText = `${ocrCategory || ''} ${description || ''}`.toLowerCase();
         
         // Food & Beverages mapping (English + Indonesian)
-        if (categoryLower.includes('food') || categoryLower.includes('restaurant') || 
-            categoryLower.includes('cafe') || categoryLower.includes('grocery') || 
-            categoryLower.includes('beverage') || categoryLower.includes('dining') ||
-            categoryLower.includes('makanan') || categoryLower.includes('minuman') ||
-            categoryLower.includes('restoran') || categoryLower.includes('warung') ||
-            categoryLower.includes('kafe') || categoryLower.includes('toko') ||
-            categoryLower.includes('supermarket') || categoryLower.includes('pasar')) {
+        if (searchText.includes('food') || searchText.includes('restaurant') || 
+            searchText.includes('cafe') || searchText.includes('grocery') || 
+            searchText.includes('beverage') || searchText.includes('dining') ||
+            searchText.includes('makanan') || searchText.includes('minuman') ||
+            searchText.includes('restoran') || searchText.includes('warung') ||
+            searchText.includes('kafe') || searchText.includes('supermarket') || 
+            searchText.includes('pasar') || searchText.includes('indomaret') ||
+            searchText.includes('alfamart') || searchText.includes('hypermart') ||
+            searchText.includes('giant') || searchText.includes('carrefour') ||
+            searchText.includes('hero') || searchText.includes('lottemart') ||
+            searchText.includes('mcdonald') || searchText.includes('kfc') ||
+            searchText.includes('pizza') || searchText.includes('bakery') ||
+            searchText.includes('roti') || searchText.includes('bakso') ||
+            searchText.includes('gado') || searchText.includes('nasi') ||
+            searchText.includes('ayam') || searchText.includes('seafood') ||
+            searchText.includes('kedai') || searchText.includes('rumah makan')) {
             return 'Food and Beverages';
         }
         
-        // Shopping mapping (English + Indonesian)
-        if (categoryLower.includes('shop') || categoryLower.includes('retail') || 
-            categoryLower.includes('store') || categoryLower.includes('clothing') || 
-            categoryLower.includes('fashion') || categoryLower.includes('belanja') ||
-            categoryLower.includes('toko') || categoryLower.includes('mall') ||
-            categoryLower.includes('butik') || categoryLower.includes('pakaian') ||
-            categoryLower.includes('sepatu') || categoryLower.includes('tas')) {
+        // Shopping mapping (English + Indonesian + Electronics)
+        if (searchText.includes('shop') || searchText.includes('retail') || 
+            searchText.includes('store') || searchText.includes('clothing') || 
+            searchText.includes('fashion') || searchText.includes('belanja') ||
+            searchText.includes('mall') || searchText.includes('butik') ||
+            searchText.includes('pakaian') || searchText.includes('sepatu') ||
+            searchText.includes('tas') || searchText.includes('elektronik') ||
+            searchText.includes('electronic') || searchText.includes('gadget') ||
+            searchText.includes('handphone') || searchText.includes('laptop') ||
+            searchText.includes('computer') || searchText.includes('hp') ||
+            searchText.includes('smartphone') || searchText.includes('tablet') ||
+            searchText.includes('accessories') || searchText.includes('aksesoris') ||
+            searchText.includes('surya elektronik') || searchText.includes('erafone') ||
+            searchText.includes('ibox') || searchText.includes('digimap') ||
+            searchText.includes('best denki') || searchText.includes('electronic city') ||
+            searchText.includes('ace hardware') || searchText.includes('informa') ||
+            searchText.includes('ikea') || searchText.includes('courts')) {
             return 'Shopping';
         }
         
         // Entertainment mapping (English + Indonesian)
-        if (categoryLower.includes('entertainment') || categoryLower.includes('movie') || 
-            categoryLower.includes('game') || categoryLower.includes('cinema') || 
-            categoryLower.includes('sports') || categoryLower.includes('hiburan') ||
-            categoryLower.includes('bioskop') || categoryLower.includes('film') ||
-            categoryLower.includes('olahraga') || categoryLower.includes('permainan') ||
-            categoryLower.includes('karaoke') || categoryLower.includes('wisata')) {
+        if (searchText.includes('entertainment') || searchText.includes('movie') || 
+            searchText.includes('game') || searchText.includes('cinema') || 
+            searchText.includes('sports') || searchText.includes('hiburan') ||
+            searchText.includes('bioskop') || searchText.includes('film') ||
+            searchText.includes('olahraga') || searchText.includes('permainan') ||
+            searchText.includes('karaoke') || searchText.includes('wisata') ||
+            searchText.includes('cgv') || searchText.includes('xxi') ||
+            searchText.includes('cineplex') || searchText.includes('fitness') ||
+            searchText.includes('gym') || searchText.includes('spa') ||
+            searchText.includes('salon') || searchText.includes('massage')) {
             return 'Entertainment';
         }
         
         // Bills & Utilities mapping (English + Indonesian)
-        if (categoryLower.includes('utility') || categoryLower.includes('electric') || 
-            categoryLower.includes('water') || categoryLower.includes('gas') || 
-            categoryLower.includes('internet') || categoryLower.includes('phone') ||
-            categoryLower.includes('listrik') || categoryLower.includes('air') ||
-            categoryLower.includes('telepon') || categoryLower.includes('tagihan') ||
-            categoryLower.includes('pln') || categoryLower.includes('pdam') ||
-            categoryLower.includes('wifi') || categoryLower.includes('pulsa')) {
+        if (searchText.includes('utility') || searchText.includes('electric') || 
+            searchText.includes('water') || searchText.includes('gas') || 
+            searchText.includes('internet') || searchText.includes('phone') ||
+            searchText.includes('listrik') || searchText.includes('air') ||
+            searchText.includes('telepon') || searchText.includes('tagihan') ||
+            searchText.includes('pln') || searchText.includes('pdam') ||
+            searchText.includes('wifi') || searchText.includes('pulsa') ||
+            searchText.includes('telkom') || searchText.includes('indihome') ||
+            searchText.includes('byru') || searchText.includes('axis') ||
+            searchText.includes('smartfren') || searchText.includes('three') ||
+            searchText.includes('xl') || searchText.includes('indosat')) {
             return 'Bills and Utilities';
         }
         
@@ -111,11 +139,63 @@ export default function ScanReceipt({ auth }) {
                 throw new Error(ocrData.error);
             }
             
+            // Helper function to parse and validate date
+            const parseReceiptDate = (dateString) => {
+                if (!dateString) return new Date().toISOString().split('T')[0];
+                
+                // Try multiple date formats commonly found on Indonesian receipts
+                const dateFormats = [
+                    // DD/MM/YYYY or DD-MM-YYYY
+                    /^(\d{1,2})[\/-](\d{1,2})[\/-](\d{4})$/,
+                    // DD/MM/YY or DD-MM-YY
+                    /^(\d{1,2})[\/-](\d{1,2})[\/-](\d{2})$/,
+                    // YYYY-MM-DD (ISO format)
+                    /^(\d{4})-(\d{1,2})-(\d{1,2})$/,
+                    // DD MMM YYYY (16 Nov 2019)
+                    /^(\d{1,2})\s+(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\s+(\d{4})$/i
+                ];
+                
+                const dateStr = dateString.trim();
+                
+                // Try DD/MM/YYYY or DD-MM-YYYY format first (most common in Indonesia)
+                const ddmmyyyy = dateStr.match(dateFormats[0]);
+                if (ddmmyyyy) {
+                    const [, day, month, year] = ddmmyyyy;
+                    const date = new Date(year, month - 1, day);
+                    if (!isNaN(date.getTime())) {
+                        return date.toISOString().split('T')[0];
+                    }
+                }
+                
+                // Try DD/MM/YY format
+                const ddmmyy = dateStr.match(dateFormats[1]);
+                if (ddmmyy) {
+                    const [, day, month, year] = ddmmyy;
+                    const fullYear = parseInt(year) > 50 ? 1900 + parseInt(year) : 2000 + parseInt(year);
+                    const date = new Date(fullYear, month - 1, day);
+                    if (!isNaN(date.getTime())) {
+                        return date.toISOString().split('T')[0];
+                    }
+                }
+                
+                // Try ISO format
+                const iso = dateStr.match(dateFormats[2]);
+                if (iso) {
+                    const date = new Date(dateStr);
+                    if (!isNaN(date.getTime())) {
+                        return date.toISOString().split('T')[0];
+                    }
+                }
+                
+                // Fallback to current date if parsing fails
+                return new Date().toISOString().split('T')[0];
+            };
+            
             // Process the OCR results from your Gemini AI service
             const processedResults = {
                 amount: ocrData.amount || '',
-                category: mapToValidCategory(ocrData.category), // Smart mapping to valid categories
-                date: ocrData.date || new Date().toISOString().split('T')[0], // Current date as fallback
+                category: mapToValidCategory(ocrData.category, ocrData.description), // Smart mapping with description
+                date: parseReceiptDate(ocrData.date), // Better date parsing
                 description: ocrData.description || 'Receipt transaction'
             };
             
