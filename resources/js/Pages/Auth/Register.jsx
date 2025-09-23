@@ -5,6 +5,13 @@ import TextInput from '@/Components/TextInput';
 import GuestLayout from '@/Layouts/GuestLayout';
 import { Head, Link, useForm } from '@inertiajs/react';
 
+use Inertia\Inertia;
+
+Route::get('/register', function () {
+    return Inertia::render('Auth/Register');
+});
+
+
 export default function Register() {
     const { data, setData, post, processing, errors, reset } = useForm({
         name: '',
@@ -26,7 +33,21 @@ export default function Register() {
             <Head title="Register" />
 
             <form onSubmit={submit}>
-                <div>
+                <div className="flex flex-col items-center">
+                    {/* Logo */}
+                    <div className="flex items-center mb-6">
+                        <img src="/logo.png" alt="Mona Logo" className="h-10 mr-2"/>
+                        </div>
+
+                {/* {Background} */}
+                <div className="min-h-screen flex items-center justify-center"
+                    style={{backgroundColor: "#F8F7F0"}} >
+                    </div>
+
+                {/* {Card} */}
+                <div className=""></div>
+
+
                     <InputLabel htmlFor="name" value="Name" />
 
                     <TextInput
