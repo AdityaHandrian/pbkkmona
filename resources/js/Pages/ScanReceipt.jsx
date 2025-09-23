@@ -21,6 +21,58 @@ export default function ScanReceipt({ auth }) {
         'Other'
     ];
 
+    // Helper function to map OCR category to our predefined categories (multilingual)
+    const mapToValidCategory = (ocrCategory) => {
+        if (!ocrCategory) return 'Other'; // Default to Other if no category detected
+        
+        const categoryLower = ocrCategory.toLowerCase();
+        
+        // Food & Beverages mapping (English + Indonesian)
+        if (categoryLower.includes('food') || categoryLower.includes('restaurant') || 
+            categoryLower.includes('cafe') || categoryLower.includes('grocery') || 
+            categoryLower.includes('beverage') || categoryLower.includes('dining') ||
+            categoryLower.includes('makanan') || categoryLower.includes('minuman') ||
+            categoryLower.includes('restoran') || categoryLower.includes('warung') ||
+            categoryLower.includes('kafe') || categoryLower.includes('toko') ||
+            categoryLower.includes('supermarket') || categoryLower.includes('pasar')) {
+            return 'Food and Beverages';
+        }
+        
+        // Shopping mapping (English + Indonesian)
+        if (categoryLower.includes('shop') || categoryLower.includes('retail') || 
+            categoryLower.includes('store') || categoryLower.includes('clothing') || 
+            categoryLower.includes('fashion') || categoryLower.includes('belanja') ||
+            categoryLower.includes('toko') || categoryLower.includes('mall') ||
+            categoryLower.includes('butik') || categoryLower.includes('pakaian') ||
+            categoryLower.includes('sepatu') || categoryLower.includes('tas')) {
+            return 'Shopping';
+        }
+        
+        // Entertainment mapping (English + Indonesian)
+        if (categoryLower.includes('entertainment') || categoryLower.includes('movie') || 
+            categoryLower.includes('game') || categoryLower.includes('cinema') || 
+            categoryLower.includes('sports') || categoryLower.includes('hiburan') ||
+            categoryLower.includes('bioskop') || categoryLower.includes('film') ||
+            categoryLower.includes('olahraga') || categoryLower.includes('permainan') ||
+            categoryLower.includes('karaoke') || categoryLower.includes('wisata')) {
+            return 'Entertainment';
+        }
+        
+        // Bills & Utilities mapping (English + Indonesian)
+        if (categoryLower.includes('utility') || categoryLower.includes('electric') || 
+            categoryLower.includes('water') || categoryLower.includes('gas') || 
+            categoryLower.includes('internet') || categoryLower.includes('phone') ||
+            categoryLower.includes('listrik') || categoryLower.includes('air') ||
+            categoryLower.includes('telepon') || categoryLower.includes('tagihan') ||
+            categoryLower.includes('pln') || categoryLower.includes('pdam') ||
+            categoryLower.includes('wifi') || categoryLower.includes('pulsa')) {
+            return 'Bills and Utilities';
+        }
+        
+        // Default to Other if no match found
+        return 'Other';
+    };
+
     const handleFileChange = (event) => {
         const file = event.target.files[0];
         setSelectedFile(file);
@@ -62,7 +114,7 @@ export default function ScanReceipt({ auth }) {
             // Process the OCR results from your Gemini AI service
             const processedResults = {
                 amount: ocrData.amount || '',
-                category: ocrData.category || 'Food and Beverages', // Map to your categories if needed
+                category: mapToValidCategory(ocrData.category), // Smart mapping to valid categories
                 date: ocrData.date || new Date().toISOString().split('T')[0], // Current date as fallback
                 description: ocrData.description || 'Receipt transaction'
             };
