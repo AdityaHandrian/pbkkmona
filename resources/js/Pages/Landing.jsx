@@ -38,7 +38,7 @@ export default function Landing({ auth }) {
                         </p>
 
                         <a
-                            href="/scan-receipt"
+                            href="/Register"
                             className="inline-block bg-[#058743] text-white px-10 py-4 rounded-lg text-xl font-semibold hover:bg-[#046635] transition-colors duration-200"
                         >
                             Sign Up For Free
