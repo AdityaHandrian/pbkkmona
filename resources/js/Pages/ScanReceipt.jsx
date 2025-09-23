@@ -8,7 +8,7 @@ export default function ScanReceipt({ auth }) {
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
     const [formData, setFormData] = useState({
         amount: '',
-        category: 'Food and Beverages',
+        category: 'Other',
         date: '',
         description: ''
     });
