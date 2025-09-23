@@ -23,10 +23,10 @@ Route::get('/testing', function () {
 })->name('testing');
 
 Route::get('/scan-receipt', function () {
-    return view('scan-receipt');
+    return Inertia::render('ScanReceipt');
 })->name('scan-receipt');
 
-Route::post('/process-receipt', [OcrController::class, 'getAIResponse']);
+Route::post('/process-receipt', [OcrController::class, 'processReceipt']);
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
