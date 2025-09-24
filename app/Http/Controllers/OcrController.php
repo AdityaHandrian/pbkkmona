@@ -46,7 +46,7 @@ class OcrController extends Controller
                 'amount' => $response['amount'] ?? '',
                 'date' => $response['date'] ?? date('Y-m-d'),
                 'description' => $response['description'] ?? 'Receipt transaction',
-                'category' => $response['category'] ?? 'Food and Beverages' // For React compatibility
+                'category' => $response['category'] ?? 'Other'
             ];
             
             return response()->json($formattedResponse);
