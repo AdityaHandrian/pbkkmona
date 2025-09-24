@@ -5,13 +5,6 @@ import TextInput from '@/Components/TextInput';
 import GuestLayout from '@/Layouts/GuestLayout';
 import { Head, Link, useForm } from '@inertiajs/react';
 
-use Inertia\Inertia;
-
-Route::get('/register', function () {
-    return Inertia::render('Auth/Register');
-});
-
-
 export default function Register() {
     const { data, setData, post, processing, errors, reset } = useForm({
         name: '',
