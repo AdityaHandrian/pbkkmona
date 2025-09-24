@@ -21,6 +21,37 @@ export default function ScanReceipt({ auth }) {
         'Other'
     ];
 
+    // Image compression function to speed up camera photos
+    const compressImage = (file, maxWidth = 1024, quality = 0.8) => {
+        return new Promise((resolve) => {
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            const img = new Image();
+            
+            img.onload = () => {
+                // Calculate new dimensions while maintaining aspect ratio
+                const ratio = Math.min(maxWidth / img.width, maxWidth / img.height);
+                canvas.width = img.width * ratio;
+                canvas.height = img.height * ratio;
+                
+                // Draw and compress the image
+                ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                
+                // Convert to compressed blob
+                canvas.toBlob((blob) => {
+                    // Create a new File object with the same name
+                    const compressedFile = new File([blob], file.name, {
+                        type: 'image/jpeg',
+                        lastModified: Date.now()
+                    });
+                    resolve(compressedFile);
+                }, 'image/jpeg', quality);
+            };
+            
+            img.src = URL.createObjectURL(file);
+        });
+    };
+
     // Helper function to map OCR category to our predefined categories (multilingual)
     const mapToValidCategory = (ocrCategory, description = '') => {
         if (!ocrCategory && !description) return 'Other';
@@ -101,9 +132,27 @@ export default function ScanReceipt({ auth }) {
         return 'Other';
     };
 
-    const handleFileChange = (event) => {
+    const handleFileChange = async (event) => {
         const file = event.target.files[0];
-        setSelectedFile(file);
+        if (!file) return;
+        
+        // Check if image needs compression (>1MB or from camera)
+        const needsCompression = file.size > 1024 * 1024; // 1MB threshold
+        
+        if (needsCompression) {
+            try {
+                console.log(`Compressing image: ${(file.size / 1024 / 1024).toFixed(2)}MB`);
+                const compressedFile = await compressImage(file);
+                console.log(`Compressed to: ${(compressedFile.size / 1024 / 1024).toFixed(2)}MB`);
+                setSelectedFile(compressedFile);
+            } catch (error) {
+                console.error('Compression failed, using original:', error);
+                setSelectedFile(file);
+            }
+        } else {
+            setSelectedFile(file);
+        }
+        
         // Reset results when new file is selected
         setOcrResults(null);
     };
