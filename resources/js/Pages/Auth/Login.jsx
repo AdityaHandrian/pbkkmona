@@ -6,6 +6,8 @@ import TextInput from '@/Components/TextInput';
 import GuestLayout from '@/Layouts/GuestLayout';
 import { Head, Link, useForm } from '@inertiajs/react';
 
+// UPDATED: make the center box wider on larger screens
+// Behavior: small (mobile) keeps max-w-md, on medium+ screens it becomes much wider (max-w-2xl)
 export default function Login({ status, canResetPassword }) {
     const { data, setData, post, processing, errors, reset } = useForm({
         email: '',
@@ -26,7 +28,8 @@ export default function Login({ status, canResetPassword }) {
 
             {/* Main Container */}
             <div className="min-h-screen flex items-center justify-center px-4" style={{ backgroundColor: '#F8F7F0' }}>
-                <div className="w-full max-w-md">
+                {/* Changed here: default max-w-md for mobile, on md screens use max-w-2xl for a much wider card */}
+                <div className="w-full max-w-md md:max-w-2xl">
                     {/* Logo Section */}
                     <div className="text-center mb-8">
                         <div className="flex justify-center mb-6">
@@ -44,7 +47,8 @@ export default function Login({ status, canResetPassword }) {
                     </div>
 
                     {/* Login Card */}
-                    <div className="bg-white rounded-3xl shadow-lg p-8">
+                    {/* Ensure the card fills the container with w-full */}
+                    <div className="bg-white rounded-3xl shadow-lg p-8 w-full">
                         {/* Header */}
                         <div className="text-center mb-6">
                             <h2 className="text-2xl font-bold mb-2" style={{ color: '#2C2C2C' }}>
