@@ -28,13 +28,15 @@ Analisis gambar struk ini. Ekstrak informasi berikut dan berikan HANYA dalam for
 2. "amount": Angka total akhir transaksi tanpa titik atau koma. Jika ada diskon atau pajak, gunakan jumlah setelah kalkulasi.
 3. "date": Tanggal transaksi dalam format YYYY-MM-DD, tanggal transaksi pasti tidak lebih dari 90 hari yang lalu, pastikan data yang diberikan akurat.
 4. "description": Deskripsi singkat dan jelas dari transaksi, biasanya nama toko atau item utama.
+5. "category": Kategorikan transaksi ke dalam salah satu dari berikut: 'Food and Beverages', 'Shopping', 'Entertainment', 'Bills and Utilities', 'Other'.
 
 Contoh output JSON yang diinginkan:
 {
     "type": "expense",
     "amount": 115500,
     "date": "2024-05-21",
-    "description": "Pembelian di Indomaret"
+    "description": "Pembelian di Indomaret",
+    "category": "Food and Beverages"
 }
 
 Jika ada informasi yang tidak ditemukan, berikan nilai null untuk field tersebut. Berikan HANYA JSON, tanpa teks tambahan.
