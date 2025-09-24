@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import AppLayout from '@/Layouts/AppLayout';
 
 export default function ScanReceipt({ auth }) {
@@ -6,6 +6,7 @@ export default function ScanReceipt({ auth }) {
     const [isScanning, setIsScanning] = useState(false);
     const [ocrResults, setOcrResults] = useState(null);
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+    const [windowWidth, setWindowWidth] = useState(typeof window !== 'undefined' ? window.innerWidth : 1024);
     const [formData, setFormData] = useState({
         amount: '',
         category: 'Other',
@@ -20,6 +21,16 @@ export default function ScanReceipt({ auth }) {
         'Bills and Utilities',
         'Other'
     ];
+
+    // Handle window resize for responsive filename truncation
+    useEffect(() => {
+        const handleResize = () => {
+            setWindowWidth(window.innerWidth);
+        };
+
+        window.addEventListener('resize', handleResize);
+        return () => window.removeEventListener('resize', handleResize);
+    }, []);
 
     // Image compression function to speed up camera photos
     const compressImage = (file, maxWidth = 1024, quality = 0.8) => {
@@ -285,6 +296,82 @@ export default function ScanReceipt({ auth }) {
         }));
     };
 
+    // Helper function to format date as DD/MM/YYYY for display
+    const formatDateForDisplay = (dateString) => {
+        if (!dateString) return '';
+        const date = new Date(dateString);
+        if (isNaN(date.getTime())) return dateString;
+        
+        const day = String(date.getDate()).padStart(2, '0');
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const year = date.getFullYear();
+        
+        return `${day}/${month}/${year}`;
+    };
+
+    // Helper function to convert DD/MM/YYYY back to YYYY-MM-DD for input value
+    const parseDateFromDisplay = (displayDate) => {
+        if (!displayDate) return '';
+        
+        // If it's already in YYYY-MM-DD format, return as is
+        if (displayDate.match(/^\d{4}-\d{2}-\d{2}$/)) {
+            return displayDate;
+        }
+        
+        // Parse DD/MM/YYYY format
+        const parts = displayDate.split('/');
+        if (parts.length === 3) {
+            const [day, month, year] = parts;
+            return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
+        }
+        
+        return displayDate;
+    };
+
+    // Helper function to truncate filename with responsive length based on screen size
+    const truncateFilename = (filename) => {
+        if (!filename) return '';
+        
+        // Dynamic max length based on current screen width
+        const getMaxLength = () => {
+            if (windowWidth >= 1536) return 50; // 2xl screens - show more
+            if (windowWidth >= 1280) return 40; // xl screens  
+            if (windowWidth >= 1024) return 35; // lg screens
+            if (windowWidth >= 768) return 30;  // md screens
+            if (windowWidth >= 640) return 25;  // sm screens
+            return 20; // xs screens - very tight
+        };
+        
+        const maxLength = getMaxLength();
+        
+        if (filename.length <= maxLength) return filename;
+        
+        // Find the last dot for extension
+        const lastDotIndex = filename.lastIndexOf('.');
+        if (lastDotIndex === -1) {
+            // No extension, just truncate
+            return filename.substring(0, maxLength - 3) + '...';
+        }
+        
+        const nameWithoutExt = filename.substring(0, lastDotIndex);
+        const extension = filename.substring(lastDotIndex);
+        
+        // Calculate available space for name (total - extension - ellipsis)
+        const availableSpace = maxLength - extension.length - 3;
+        
+        if (availableSpace <= 0) {
+            // Extension is too long, just show extension
+            return '...' + extension;
+        }
+        
+        if (nameWithoutExt.length <= availableSpace) {
+            return filename; // No truncation needed
+        }
+        
+        // Truncate name and add ellipsis before extension
+        return nameWithoutExt.substring(0, availableSpace) + '...' + extension;
+    };
+
     const handleAddTransaction = () => {
         console.log('Adding transaction:', formData);
         // Add transaction logic here
@@ -345,7 +432,9 @@ export default function ScanReceipt({ auth }) {
                                             />
                                         </div>
                                         <h3 className="text-lg font-medium text-[#058743] mb-1">File Selected</h3>
-                                        <p className="text-[#2C2C2C] font-medium mb-1">{selectedFile.name}</p>
+                                        <p className="text-[#2C2C2C] font-medium mb-1 break-words" title={selectedFile.name}>
+                                            {truncateFilename(selectedFile.name)}
+                                        </p>
                                         <p className="text-[#757575] text-sm">
                                             {(selectedFile.size / 1024 / 1024).toFixed(2)} MB
                                         </p>
@@ -517,30 +606,32 @@ export default function ScanReceipt({ auth }) {
                                             Date<span className="text-red-500">*</span>
                                         </label>
                                         <div className="date-input-container relative">
+                                            {/* Display input showing DD/MM/YYYY format */}
                                             <input
+                                                type="text"
+                                                value={formatDateForDisplay(formData.date)}
+                                                placeholder="DD/MM/YYYY"
+                                                readOnly
+                                                className="w-full px-3 py-2 border border-[#C8C0C0] rounded text-[#2C2C2C] bg-gray-100 cursor-pointer"
+                                                onClick={() => document.getElementById('hidden-date-picker').showPicker()}
+                                            />
+                                            {/* Hidden date picker */}
+                                            <input
+                                                id="hidden-date-picker"
                                                 type="date"
                                                 value={formData.date}
                                                 onChange={(e) => handleInputChange('date', e.target.value)}
-                                                className="w-full px-3 py-2 border border-[#C8C0C0] rounded text-[#2C2C2C] bg-gray-100 cursor-pointer"
-                                                onKeyDown={(e) => e.preventDefault()}
+                                                className="absolute opacity-0 pointer-events-none"
                                             />
-                                            <style jsx>{`
-                                                .date-input-container input {
-                                                    position: relative;
-                                                }
-                                                .date-input-container input[type="date"]::-webkit-calendar-picker-indicator {
-                                                    background: transparent;
-                                                    bottom: 0;
-                                                    color: transparent;
-                                                    cursor: pointer;
-                                                    height: auto;
-                                                    left: 0;
-                                                    position: absolute;
-                                                    right: 0;
-                                                    top: 0;
-                                                    width: auto;
-                                                }
-                                            `}</style>
+                                            {/* Calendar icon */}
+                                            <div 
+                                                className="absolute inset-y-0 right-0 flex items-center px-3 cursor-pointer"
+                                                onClick={() => document.getElementById('hidden-date-picker').showPicker()}
+                                            >
+                                                <svg className="w-4 h-4 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+                                                    <path fillRule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clipRule="evenodd" />
+                                                </svg>
+                                            </div>
                                         </div>
                                     </div>
 
